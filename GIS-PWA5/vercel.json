@@ -1,12 +1,1 @@
-{
-  "name": "gis-pwa5-dashboard",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "vercel dev",
-    "deploy": "vercel"
-  },
-  "dependencies": {
-    "mongodb": "^6.3.0"
-  }
-}
+{"functions":{"api/*.js":{"maxDuration":30}}}

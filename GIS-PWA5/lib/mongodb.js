@@ -1,24 +1,20 @@
-import { MongoClient } from 'mongodb';
-
-const uri = process.env.MONGODB_URI;
-const options = {};
-
-let client;
+const { MongoClient, ServerApiVersion } = require("mongodb");
 let clientPromise;
-
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your Mongo URI to .env.local or Vercel Environment Variables');
-}
-
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
+function getClientPromise(){
+  if(!process.env.MONGODB_URI) throw new Error("MONGODB_URI is not configured");
+  if(!clientPromise){
+    const client=new MongoClient(process.env.MONGODB_URI,{
+      serverApi:{version:ServerApiVersion.v1,strict:true,deprecationErrors:true},
+      maxPoolSize:10
+    });
+    clientPromise=client.connect();
   }
-  clientPromise = global._mongoClientPromise;
-} else {
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+  return clientPromise;
 }
-
-export default clientPromise;
+async function getCollection(){
+  const client=await getClientPromise();
+  const db=process.env.MONGODB_DB, collection=process.env.MONGODB_COLLECTION;
+  if(!db||!collection) throw new Error("MONGODB_DB and MONGODB_COLLECTION are required");
+  return client.db(db).collection(collection);
+}
+module.exports={getCollection};
